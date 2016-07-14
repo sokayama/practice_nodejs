@@ -1,25 +1,42 @@
 // 必要なモジュールをロードする
 var http = require('http');
-var querystring = require('querystring');
-var crypto = require('crypto');
+// var querystring = require('querystring');
+// var crypto = require('crypto');
 
 // http.Serverオブジェクトを作成する
 var server = http.createServer();
+
+var io = require("socket.io").listen(server);
 
 var fs = require("fs");
 
 server.on("request", function(req, res){
   var url = req.url;
-  console.log(url);
-  console.log(req.headers);
+  //console.log(url);
+  //console.log(req.headers);
   
-  if(url === "/api")
+  if(url.match("/api"))
   {
-      res.writeHead(200, {"Content-Type": "text/plain"});
-      res.write("api access");
-      console.log("api access");
+    console.log("api access");
+    io.sockets.on("connection",function(socket){//(2)
+      console.log("connected");
+      socket.on("send",function(send_data){//(4)クライアントからデータを受け取る
+          console.log("receive send_data : " + send_data);
+       socket.emit("pudh",send_data,function(data){//(5)本人に返す
+          console.log("push : " + data);
+        });
+        socket.broadcast.emit("push","0.0");//(6)ほかの人に送信
+      });
+      socket.on("disconnected",function(){//(8)connectionおわり
+        console.log("disconnected");
+      });
+    });
+      // res.writeHead(200, {"Content-Type": "text/plain"});
+      // res.write("api access");
+      // console.log("api access");
 
-      return res.end();
+      // return res.end();
+
 
   }else if(url === "/")
   {
@@ -27,7 +44,7 @@ server.on("request", function(req, res){
       if (err) {
         res.writeHead(404, {"Content-Type": "text/plain"});
         res.write("not found!");
-        console.log("cannot read file");
+        console.log("cannot read index.html file");
 
         return res.end();
       }
@@ -41,7 +58,7 @@ server.on("request", function(req, res){
       if (err) {
         res.writeHead(404, {"Content-Type": "text/plain"});
         res.write("not found!");
-        console.log("cannot read file");
+        console.log("cannot read html file");
 
         return res.end();
       }
@@ -53,9 +70,9 @@ server.on("request", function(req, res){
   }else if(url.match(".js")){
     fs.readFile("." + url, "utf8", function(err, data) {
       if (err) {
-        res.writeHead(404, {"Content-Type": "text/plain"});
-        res.write("not found!");
-        console.log("cannot read file");
+        // res.writeHead(404, {"Content-Type": "text/plain"});
+        // res.write("not found!");
+        // console.log("cannot read js file");
 
         return res.end();
       }
@@ -69,7 +86,7 @@ server.on("request", function(req, res){
       if (err) {
         res.writeHead(404, {"Content-Type": "text/plain"});
         res.write("not found!");
-        console.log("cannot read file");
+        console.log("cannot read jpg file");
 
         return res.end();
       }
@@ -78,6 +95,8 @@ server.on("request", function(req, res){
       res.write(data);
       res.end();
     });
+  }else{
+      //console.log("cannot read **undefined** file");    
   }
 
 });

@@ -1,6 +1,7 @@
 var c, gl, vs, fs;
 var textures = [];
 
+
 window.onload = function(){
 	// - canvas と WebGL コンテキストの初期化 -------------------------------------
 	// canvasエレメントを取得
@@ -18,6 +19,7 @@ window.onload = function(){
 };
 
 function initialize(){
+
 
 	// - シェーダとプログラムオブジェクトの初期化 ---------------------------------
 	// シェーダのソースを取得
@@ -186,6 +188,19 @@ function initialize(){
 	{
 		slider20 = eve.currentTarget.value - 0;//cast
 	},false);
+
+
+	var socket = io.connect("/api");//(1)connection開始
+	socket.on("connect",function(){//(2)
+		socket.emit("send",slider10.value);//(3)サーバーへ送る
+		console.log("send data");
+		socket.on("push",function(push_data){//(7)サーバーからデータを受け取る
+			ele_slider10.value = push_data;
+			console.log("receive push_data" + push_data);
+			
+		})
+	});
+
 
 
 	//マウスドラッグでY軸回転
