@@ -6,17 +6,24 @@ var http = require('http');
 // http.Serverオブジェクトを作成する
 var server = http.createServer();
 
-var io = require("socket.io").listen(server);
+var io = require("socket.io")(server);
+//タイムアウトを5秒に設定する
+io.set('heartbeat timeout',5000);
+io.set('heartbeat interval',5000);
 
 var guestdata_list = [];
 var guestdata=0;
 
 var push_data = 0;
-io.sockets.on("connection",function(socket){//
+// io.sockets.on("connection",function(socket){//
+io.on("connection",function(socket){//
 
 //接続しているクライアント情報取得    
+  socket.on("disconnected",function(){
+    console.log("disconectttttt");
+  })
   console.log("[" + socket.handshake.address + "] is connected");
-  guestdata_list.push("[" + socket.handshake.address + "] \n");//接続者リスト（arrayだけど）をつくる
+  guestdata_list.push(socket.handshake.address);//接続者リスト（arrayだけど）をつくる
   guestdata = socket.handshake.address;
 
   socket.emit("push_guest_list",guestdata_list);//接続者リストを送る
@@ -27,14 +34,16 @@ io.sockets.on("connection",function(socket){//
   socket.on("user_disconnected",function(data){//ディスコネしたの誰？
     console.log("[" + data + "] is disconnected");
     for(var i =0;i<guestdata_list.length;i++){
-        if(guestdata_list[i] == data){
+        console.log(typeof data);
+        if(guestdata_list[i] === data){
           console.log("[" + data + "] is deleted");
           guestdata_list.splice(i,1);
-          
-          break;//同じIPが二人以上いたら消さないように
-        }
-      }
-      
+          break;//同じIPが二人以上いたら全部消さないように
+       }
+    }
+    console.log("帰っていきます")
+    socket.broadcast.emit("push_guest_list",guestdata_list);//接続者リストを送る
+     
   });
 
 

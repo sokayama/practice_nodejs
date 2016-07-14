@@ -197,7 +197,7 @@ function initialize(){
 	// 		socket.emit(send,ele_slider.value);//サーバーへ送信
 	// 	},false);
 	// }
-	// emit_slider.prototype;
+	// 
 
 	var guestdata_list = [];
 	var myIP = 0;
@@ -205,6 +205,11 @@ function initialize(){
 
 	var socket = io.connect();//connection開始
 	var ele_ipbox = document.getElementById("ip_box");
+	var ele_button_disconnect = document.getElementById("button_disconnect");
+	ele_button_disconnect.addEventListener("click",function(){
+		console.log("切断")
+		socket.disconnect();
+	})
 
 		$(document).ready(function (){
 			socket.on("push1",function(push_data){//サーバーから受信
@@ -229,6 +234,7 @@ function initialize(){
 			});
 
 			socket.on("push_guest_list",function(push_data){//接続してる人たち
+				console.log("書き変わってます")
 				guestdata_list = push_data;
 				console.log("receive guestdata_list : " + push_data);
 				ele_ipbox.value = guestdata_list;
@@ -237,9 +243,19 @@ function initialize(){
 				myIP = push_data;
 				console.log("私のIPは" + myIP)
 			});
-			socket.on("disconnect",function(){//このIP（自分）がディスコネしましたよ～
-				socket.emit("user_disconnected",myIP);
+			socket.on("connect",function(){
+			　//タイムアウトを5秒に設定する
+			　socket.headbeatTimeout = 5000;
 			});
+			window.onbeforeunload = function (e) {
+				console.log("disconnected..." + myIP)
+				socket.emit("user_disconnected",myIP);
+	
+			}
+			// socket.on("disconnect",function(){//このIP（自分）がディスコネしましたよ～
+			// 	console.log("disconnected..." + myIP)
+			// 	socket.emit("user_disconnected",myIP);
+			// });
 			
 		});
 		ele_slider1.addEventListener("change",function(eve){
