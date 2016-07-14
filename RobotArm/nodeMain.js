@@ -8,20 +8,45 @@ var server = http.createServer();
 
 var io = require("socket.io").listen(server);
 
+var guestdata_list = [];
+var guestdata=0;
 
 var push_data = 0;
 io.sockets.on("connection",function(socket){//
-  console.log("connected");
+
+//接続しているクライアント情報取得    
+  console.log("[" + socket.handshake.address + "] is connected");
+  guestdata_list.push("[" + socket.handshake.address + "] \n");//接続者リスト（arrayだけど）をつくる
+  guestdata = socket.handshake.address;
+
+  socket.emit("push_guest_list",guestdata_list);//接続者リストを送る
+  socket.broadcast.emit("push_guest_list",guestdata_list);//接続者リストを送る
+
+  socket.emit("push_guest",guestdata);//あなたのIP教えます
+  
+  socket.on("user_disconnected",function(data){//ディスコネしたの誰？
+    console.log("[" + data + "] is disconnected");
+    for(var i =0;i<guestdata_list.length;i++){
+        if(guestdata_list[i] == data){
+          console.log("[" + data + "] is deleted");
+          guestdata_list.splice(i,1);
+          
+          break;//同じIPが二人以上いたら消さないように
+        }
+      }
+      
+  });
+
 
   socket.on("send1",function(send_data){//クライアントから受信
-    console.log("recerive send_data : "+ send_data)
+    console.log("recerive send_data : "+ send_data);
     push_data = send_data;
 
     socket.emit("push1",push_data);
     socket.broadcast.emit("push1",push_data);
   });
   socket.on("send10",function(send_data){//クライアントから受信
-    console.log("recerive send_data : "+ send_data)
+    console.log("recerive send_data : "+ send_data);
     push_data = send_data;
 
     socket.emit("push10",push_data);
@@ -35,7 +60,7 @@ io.sockets.on("connection",function(socket){//
     socket.broadcast.emit("push2",push_data);
   });
   socket.on("send20",function(send_data){//クライアントから受信
-    console.log("recerive send_data : "+ send_data)
+    console.log("recerive send_data : "+ send_data);
     push_data = send_data;
 
     socket.emit("push20",push_data);
@@ -51,9 +76,9 @@ server.on("request", function(req, res){
   var url = req.url;
   //console.log(url);
   //console.log(req.headers);
-  
-  if(url.match("/api"))
-  {
+
+
+  if(url.match("/api")){
     console.log("api access");
       // res.writeHead(200, {"Content-Type": "text/plain"});
       // res.write("api access");
@@ -62,8 +87,7 @@ server.on("request", function(req, res){
       // return res.end();
 
 
-  }else if(url === "/")
-  {
+  }else if(url === "/"){
     fs.readFile("index.html", "utf8", function(err, data) {
       if (err) {
         res.writeHead(404, {"Content-Type": "text/plain"});

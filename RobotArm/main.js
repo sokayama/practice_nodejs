@@ -160,7 +160,6 @@ function initialize(){
 
 
 
-
 	//根元スライダ情報取得
 	//まがる
 	var ele_slider1 = document.getElementById("slider1");
@@ -168,7 +167,6 @@ function initialize(){
 	ele_slider1.addEventListener("input",function(eve)
 	{
 		slider1 = eve.currentTarget.value - 0;//cast
-
 	},false);
 	//ひねる
 	var ele_slider10 = document.getElementById("slider10");
@@ -194,10 +192,21 @@ function initialize(){
 		slider20 = eve.currentTarget.value - 0;//cast
 	},false);
 
+	// function emit_slider(send,ele_slider){
+	// 	ele_slider.addEventListener("change",function(eve){
+	// 		socket.emit(send,ele_slider.value);//サーバーへ送信
+	// 	},false);
+	// }
+	// emit_slider.prototype;
+
+	var guestdata_list = [];
+	var myIP = 0;
+
+
 	var socket = io.connect();//connection開始
+	var ele_ipbox = document.getElementById("ip_box");
 
 		$(document).ready(function (){
-
 			socket.on("push1",function(push_data){//サーバーから受信
 				ele_slider1.value = push_data;
 				slider1 = push_data;
@@ -218,6 +227,20 @@ function initialize(){
 				slider20 = push_data;
 				console.log("receive push_data : " + push_data);
 			});
+
+			socket.on("push_guest_list",function(push_data){//接続してる人たち
+				guestdata_list = push_data;
+				console.log("receive guestdata_list : " + push_data);
+				ele_ipbox.value = guestdata_list;
+			});
+			socket.on("push_guest",function(push_data){//自分のIPキープしとく
+				myIP = push_data;
+				console.log("私のIPは" + myIP)
+			});
+			socket.on("disconnect",function(){//このIP（自分）がディスコネしましたよ～
+				socket.emit("user_disconnected",myIP);
+			});
+			
 		});
 		ele_slider1.addEventListener("change",function(eve){
 			socket.emit("send1",ele_slider1.value);//サーバーへ送信
@@ -232,6 +255,8 @@ function initialize(){
 			socket.emit("send20",ele_slider20.value);//サーバーへ送信
 		},false);
 
+
+		
 
 	//マウスドラッグでY軸回転
 	var flgDrag = false;
