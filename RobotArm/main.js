@@ -157,6 +157,10 @@ function initialize(){
 	
 	var lightDirection = [0.577, 0.577, 0.577];
 
+
+
+
+
 	//根元スライダ情報取得
 	//まがる
 	var ele_slider1 = document.getElementById("slider1");
@@ -164,6 +168,7 @@ function initialize(){
 	ele_slider1.addEventListener("input",function(eve)
 	{
 		slider1 = eve.currentTarget.value - 0;//cast
+
 	},false);
 	//ひねる
 	var ele_slider10 = document.getElementById("slider10");
@@ -190,17 +195,17 @@ function initialize(){
 	},false);
 
 
-	var socket = io.connect("/api");//(1)connection開始
-	socket.on("connect",function(){//(2)
-		socket.emit("send",slider10.value);//(3)サーバーへ送る
-		console.log("send data");
-		socket.on("push",function(push_data){//(7)サーバーからデータを受け取る
-			ele_slider10.value = push_data;
-			console.log("receive push_data" + push_data);
-			
-		})
-	});
 
+	// $(document).ready(function (){
+	// 	var socket = io.connect();//connection開始
+
+	// 	socket.on("push",function(push_data){//サーバーから受信
+	// 		ele_slider1.value = push_data;
+	// 		slider1 = push_data;
+	// 		console.log("receive push_data : " + push_data);
+	// 	});
+	// 	socket.emit("send",ele_slider1.value);//サーバーへ送信
+	// });
 
 
 	//マウスドラッグでY軸回転
@@ -247,7 +252,15 @@ function initialize(){
 	timerFunc();
 	function timerFunc()
 	{
-		
+
+			socket.on("push",function(push_data){//サーバーから受信
+				ele_slider1.value = push_data;
+				slider1 = push_data;
+				console.log("receive push_data : " + push_data);
+			});
+			socket.emit("send",ele_slider1.value);//サーバーへ送信
+
+
 		counter++;
 
 		// - レンダリングのための WebGL 初期化設定 ------------------------------------

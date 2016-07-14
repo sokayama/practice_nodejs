@@ -8,6 +8,22 @@ var server = http.createServer();
 
 var io = require("socket.io").listen(server);
 
+
+var push_data = 0;
+io.sockets.on("connection",function(socket){//
+  console.log("connected");
+
+  socket.on("send",function(send_data){//クライアントから受信
+    console.log("recerive send_data : "+ send_data)
+    push_data = send_data;
+
+    socket.emit("push",push_data);
+    socket.broadcast.emit("push",push_data);
+  });
+});
+
+
+
 var fs = require("fs");
 
 server.on("request", function(req, res){
@@ -18,19 +34,6 @@ server.on("request", function(req, res){
   if(url.match("/api"))
   {
     console.log("api access");
-    io.sockets.on("connection",function(socket){//(2)
-      console.log("connected");
-      socket.on("send",function(send_data){//(4)クライアントからデータを受け取る
-          console.log("receive send_data : " + send_data);
-       socket.emit("pudh",send_data,function(data){//(5)本人に返す
-          console.log("push : " + data);
-        });
-        socket.broadcast.emit("push","0.0");//(6)ほかの人に送信
-      });
-      socket.on("disconnected",function(){//(8)connectionおわり
-        console.log("disconnected");
-      });
-    });
       // res.writeHead(200, {"Content-Type": "text/plain"});
       // res.write("api access");
       // console.log("api access");
