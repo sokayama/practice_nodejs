@@ -194,18 +194,43 @@ function initialize(){
 		slider20 = eve.currentTarget.value - 0;//cast
 	},false);
 
+	var socket = io.connect();//connection開始
 
+		$(document).ready(function (){
 
-	// $(document).ready(function (){
-	// 	var socket = io.connect();//connection開始
-
-	// 	socket.on("push",function(push_data){//サーバーから受信
-	// 		ele_slider1.value = push_data;
-	// 		slider1 = push_data;
-	// 		console.log("receive push_data : " + push_data);
-	// 	});
-	// 	socket.emit("send",ele_slider1.value);//サーバーへ送信
-	// });
+			socket.on("push1",function(push_data){//サーバーから受信
+				ele_slider1.value = push_data;
+				slider1 = push_data;
+				console.log("receive push_data : " + push_data);
+			});
+			socket.on("push10",function(push_data){//サーバーから受信
+				ele_slider10.value = push_data;
+				slider10 = push_data;
+				console.log("receive push_data : " + push_data);
+			});
+			socket.on("push2",function(push_data){//サーバーから受信
+				ele_slider2.value = push_data;
+				slider2 = push_data;
+				console.log("receive push_data : " + push_data);
+			});
+			socket.on("push20",function(push_data){//サーバーから受信
+				ele_slider20.value = push_data;
+				slider20 = push_data;
+				console.log("receive push_data : " + push_data);
+			});
+		});
+		ele_slider1.addEventListener("change",function(eve){
+			socket.emit("send1",ele_slider1.value);//サーバーへ送信
+		},false);
+		ele_slider10.addEventListener("change",function(eve){
+			socket.emit("send10",ele_slider10.value);//サーバーへ送信
+		},false);
+		ele_slider2.addEventListener("change",function(eve){
+			socket.emit("send2",ele_slider2.value);//サーバーへ送信
+		},false);
+		ele_slider20.addEventListener("change",function(eve){
+			socket.emit("send20",ele_slider20.value);//サーバーへ送信
+		},false);
 
 
 	//マウスドラッグでY軸回転
@@ -252,14 +277,6 @@ function initialize(){
 	timerFunc();
 	function timerFunc()
 	{
-
-			socket.on("push",function(push_data){//サーバーから受信
-				ele_slider1.value = push_data;
-				slider1 = push_data;
-				console.log("receive push_data : " + push_data);
-			});
-			socket.emit("send",ele_slider1.value);//サーバーへ送信
-
 
 		counter++;
 

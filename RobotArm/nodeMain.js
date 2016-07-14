@@ -13,12 +13,33 @@ var push_data = 0;
 io.sockets.on("connection",function(socket){//
   console.log("connected");
 
-  socket.on("send",function(send_data){//クライアントから受信
+  socket.on("send1",function(send_data){//クライアントから受信
     console.log("recerive send_data : "+ send_data)
     push_data = send_data;
 
-    socket.emit("push",push_data);
-    socket.broadcast.emit("push",push_data);
+    socket.emit("push1",push_data);
+    socket.broadcast.emit("push1",push_data);
+  });
+  socket.on("send10",function(send_data){//クライアントから受信
+    console.log("recerive send_data : "+ send_data)
+    push_data = send_data;
+
+    socket.emit("push10",push_data);
+    socket.broadcast.emit("push10",push_data);
+  });
+  socket.on("send2",function(send_data){//クライアントから受信
+    console.log("recerive send_data : "+ send_data)
+    push_data = send_data;
+
+    socket.emit("push2",push_data);
+    socket.broadcast.emit("push2",push_data);
+  });
+  socket.on("send20",function(send_data){//クライアントから受信
+    console.log("recerive send_data : "+ send_data)
+    push_data = send_data;
+
+    socket.emit("push20",push_data);
+    socket.broadcast.emit("push20",push_data);
   });
 });
 
