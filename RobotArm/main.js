@@ -211,7 +211,7 @@ function initialize(){
 		socket.disconnect();
 	})
 
-		$(document).ready(function (){
+		window.onload = function (){
 			socket.on("push1",function(push_data){//サーバーから受信
 				ele_slider1.value = push_data;
 				slider1 = push_data;
@@ -257,7 +257,7 @@ function initialize(){
 			// 	socket.emit("user_disconnected",myIP);
 			// });
 			
-		});
+		};
 		ele_slider1.addEventListener("change",function(eve){
 			socket.emit("send1",ele_slider1.value);//サーバーへ送信
 		},false);
